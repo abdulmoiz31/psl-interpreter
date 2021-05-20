@@ -6,7 +6,6 @@ from rest_framework.decorators import APIView
 from rest_framework.parsers import MultiPartParser
 from django.core.files.storage import FileSystemStorage
 import requests
-import pathlib
 import os
 import time
 import cv2
@@ -100,12 +99,7 @@ class CountryView(APIView):
         for f in files:
             os.remove(basepath+"\\"+f)
 
-        pth = os.path.dirname(testing.__file__)
-        basepath = pth + "\\bgremoved"
-
-        files = os.listdir(basepath)
-        for f in files:
-            os.remove(basepath+"\\"+f)
+        
     
 
 
@@ -143,7 +137,7 @@ class CountryView(APIView):
         count = 1
             
         success = self.getFrame(sec, vidcap, count)
-
+        
         while success:
             count = count + 1
             sec = sec + frameRate
@@ -236,28 +230,28 @@ class CountryView(APIView):
 
 
     def post(self, request):
-        print("In Post")
+        #print("In Post")
         data = request.FILES['file']
         #print(data.file)
 
         fs = FileSystemStorage()
         filename = fs.save(data.name, data)
-        uploaded_file_url = fs.url(filename)
+        fs.url(filename)
 
         #print(uploaded_file_url)
         #print(data.name)
         #print(data.file)
+        #print("Here")
         self.createFrames(data)
+        
         #self.remove_background()
+        
         if os.path.exists(filename):
             os.remove(filename)
 
         frames_dir_path = os.path.dirname(testing.__file__)  + "\\frames"
          
-        try: 
-            os.mkdir(frames_dir_path) 
-        except OSError as error: 
-            print("folder exists")
+        
         print(frames_dir_path)
         result = self.predictSentence(frames_dir_path)
         print(result)
